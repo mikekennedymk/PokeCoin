@@ -17,7 +17,7 @@ namespace PokéCoin.Services
         {
             try
             { 
-            return await _context.Usuarios.ToListAsync();
+            return await _context.Usuarios.Where(e => e.RemovidoEm == null).ToArrayAsync();
 
             }
             catch (Exception ex)
@@ -47,6 +47,7 @@ namespace PokéCoin.Services
         }
         public async Task CreateUsuario(Usuarios usuario)
         {
+            usuario.RemovidoEm = null;
             _context.Usuarios.Add(usuario);
             await _context.SaveChangesAsync();
 
@@ -58,7 +59,8 @@ namespace PokéCoin.Services
         }
         public async Task DeleteUsuario(Usuarios usuario)
         {
-            _context.Usuarios.Remove(usuario);
+            usuario.RemovidoEm = DateTime.Now;
+            _context.Entry(usuario).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 

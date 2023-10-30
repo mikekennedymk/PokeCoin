@@ -18,6 +18,8 @@ namespace PokéCoin.Models
         [StringLength(80)]
         public string Senha { get; set; }
         public DateTime DataNascimento { get; set; }
+        public DateTime? RemovidoEm { get; set; }
+
 
     }
 }
