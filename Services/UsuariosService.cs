@@ -1,6 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PokéCoin.Context;
 using PokéCoin.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PokéCoin.Services
 {
@@ -16,51 +20,89 @@ namespace PokéCoin.Services
         public async Task<IEnumerable<Usuarios>> GetUsuarios()
         {
             try
-            { 
-            return await _context.Usuarios.ToListAsync();
-
+            {
+                return await _context.Usuarios.Where(u => u.RemovidoEm == null).ToListAsync();
             }
             catch (Exception ex)
             {
-                throw;
+                throw new Exception("An error occurred while getting the list of users.", ex);
             }
         }
+
         public async Task<Usuarios> GetUsuario(int id)
         {
-            var usuario = await _context.Usuarios.FindAsync(id);
-
-            return usuario;
+            try
+            {
+                var usuario = await _context.Usuarios.FindAsync(id);
+                return usuario;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (ex) here as needed
+                throw new Exception($"An error occurred while getting the user with ID {id}.", ex);
+            }
         }
+
         public async Task<IEnumerable<Usuarios>> GetUsuariosByNome(string nome)
         {
-            IEnumerable<Usuarios> usuarios;
-            if (!string.IsNullOrWhiteSpace(nome))
+            try
             {
-                usuarios = await _context.Usuarios.Where(n => n.Nome.Contains(nome)).ToListAsync();
-            }
-            else { 
-            
-                usuarios = await GetUsuarios();
-            }
+                IEnumerable<Usuarios> usuarios;
+                if (!string.IsNullOrWhiteSpace(nome))
+                {
+                    usuarios = await _context.Usuarios.Where(n => n.Nome.Contains(nome)).ToListAsync();
+                }
+                else
+                {
+                    usuarios = await GetUsuarios();
+                }
 
-            return usuarios;
+                return usuarios;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while getting users with name containing '{nome}'.", ex);
+            }
         }
+
         public async Task CreateUsuario(Usuarios usuario)
         {
-            _context.Usuarios.Add(usuario);
-            await _context.SaveChangesAsync();
-
+            try
+            {
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while creating the user.", ex);
+            }
         }
+
         public async Task UpdateUsuario(Usuarios usuario)
         {
-            _context.Entry(usuario).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
-        public async Task DeleteUsuario(Usuarios usuario)
-        {
-            _context.Usuarios.Remove(usuario);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Entry(usuario).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while updating the user.", ex);
+            }
         }
 
+        public async Task DeleteUsuario(Usuarios usuario)
+        {
+            try
+            {
+                usuario.RemovidoEm = DateTime.UtcNow;
+                _context.Usuarios.Entry(usuario).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while deleting the user.", ex);
+            }
+        }
     }
 }
