@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PokéCoin.Context;
+using PokéCoin.Services;
 
 namespace PokéCoin
 {
@@ -32,6 +33,8 @@ namespace PokéCoin
                                .AllowAnyMethod();
                     });
             });
+            services.AddHttpClient();
+            services.AddScoped<IPokemonService, PokemonService>();
 
             services.AddControllers(); // Adicione serviços de controle
 

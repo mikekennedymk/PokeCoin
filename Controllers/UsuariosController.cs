@@ -60,7 +60,7 @@ namespace PokéCoin.Controllers
 
         }
 
-        [HttpGet("{id:int}", Name = "GetUsuario")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -106,25 +106,22 @@ namespace PokéCoin.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> Edit(int id, [FromBody] Usuarios usuario)
         {
-
             try
             {
                 if (usuario.ID == id)
                 {
                     await _usuariosService.UpdateUsuario(usuario);
-                    return Ok("Usuário " + usuario.Nome + " atualizado com sucesso!");
+                    return Ok(new { mensagem = $"Usuário {usuario.Nome} atualizado com sucesso!" });
                 }
                 else
                 {
                     return BadRequest("Dados não correspondem.");
                 }
-
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao editar o usuário.");
             }
-
         }
 
         [HttpDelete("{id:int}")]
@@ -139,7 +136,7 @@ namespace PokéCoin.Controllers
                 if (usuario != null)
                 {
                     await _usuariosService.DeleteUsuario(usuario);
-                    return Ok("Usuário apagado com sucesso!");
+                    return Ok(new { mensagem = $"Usuário {usuario.Nome} removido com sucesso!" });
                 }
                 else
                 {
